@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 //use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
@@ -73,24 +74,40 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Task $task)
     {
-        //
+        $categories = \App\Models\Category::all();
+        $tags = \App\Models\Tag::all();
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get();
+
+        return view('tasks.edit', compact('task', 'categories', 'tags', 'users'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        //
+        $task->update($request->validated());
+
+        $task->tags()->sync($request->tags ?? []);
+
+        $task->assignees()->sync(
+            collect($request->assignees ?? [])->mapWithKeys(fn($id) => [$id => ['role' => 'assignee']])
+        );
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Tarea actualizada correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Task $task)
     {
-        //
+        $task->delete();
+
+        return redirect()->route('tasks.index')
+            ->with('success', 'Tarea eliminada correctamente.');
     }
 }
