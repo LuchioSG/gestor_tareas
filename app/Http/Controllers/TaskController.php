@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
@@ -64,7 +65,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //$this->authorize('view', $task);
+        $this->authorize('view', $task);
         
         $task->load(['category', 'tags', 'assignees', 'attachments']);
 
@@ -76,6 +77,7 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        $this->authorize('update', $task);
         $categories = \App\Models\Category::all();
         $tags = \App\Models\Tag::all();
         $users = \App\Models\User::where('id', '!=', auth()->id())->get();
@@ -88,6 +90,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        $this->authorize('update', $task);
         $task->update($request->validated());
 
         $task->tags()->sync($request->tags ?? []);
@@ -105,6 +108,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $this->authorize('delete', $task);
         $task->delete();
 
         return redirect()->route('tasks.index')

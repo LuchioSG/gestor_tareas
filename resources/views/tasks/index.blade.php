@@ -15,6 +15,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
+                    <x-flash-messages />
                     @forelse($tasks as $task)
                         <div class="border-b py-4 flex justify-between items-center">
                             <div>
