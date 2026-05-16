@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Mail\TaskCreated;
+use Illuminate\Support\Facades\Mail;
 //use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
@@ -55,6 +57,8 @@ class TaskController extends Controller
                 collect($request->assignees)->mapWithKeys(fn($id) => [$id => ['role' => 'assignee']])
             );
         }
+
+        Mail::to(auth()->user()->email)->send(new TaskCreated($task));
 
         return redirect()->route('tasks.index')
             ->with('success', 'Tarea creada correctamente.');
