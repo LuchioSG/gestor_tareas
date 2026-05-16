@@ -94,15 +94,40 @@
             {{-- Archivos adjuntos --}}
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <h3 class="font-medium text-gray-700 mb-3">Archivos adjuntos</h3>
+
+                {{-- Formulario de subida --}}
+                <form action="{{ route('attachments.store', $task) }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                    @csrf
+                    <div class="flex items-center gap-3">
+                        <input type="file" name="files[]" multiple
+                            class="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        <button type="submit"
+                                class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700">
+                            Subir
+                        </button>
+                    </div>
+                    @error('files') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                    @error('files.*') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </form>
+
+                {{-- Listado de archivos --}}
                 @if($task->attachments->count())
                     <ul class="space-y-2">
                         @foreach($task->attachments as $attachment)
-                            <li class="flex items-center justify-between text-sm">
-                                <span>{{ $attachment->filename }}</span>
-                                <a href="{{ Storage::url($attachment->path) }}" 
-                                    class="text-indigo-600 hover:underline" target="_blank">
-                                    Descargar
-                                </a>
+                            <li class="flex items-center justify-between text-sm border-b pb-2">
+                                <span class="text-gray-700">{{ $attachment->filename }}</span>
+                                <div class="flex gap-3">
+                                    <a href="{{ asset('storage/' . $attachment->path) }}"
+                                        class="text-indigo-600 hover:underline" target="_blank">
+                                            Descargar
+                                    </a>
+                                    <form action="{{ route('attachments.destroy', $attachment) }}" method="POST"
+                                        onsubmit="return confirm('¿Eliminar archivo?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="text-red-600 hover:underline">Eliminar</button>
+                                    </form>
+                                </div>
                             </li>
                         @endforeach
                     </ul>

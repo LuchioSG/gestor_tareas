@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\AttachmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,5 +20,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('tasks', TaskController::class)->middleware('auth');
+
+Route::post('tasks/{task}/attachments', [AttachmentController::class, 'store'])
+    ->name('attachments.store')
+    ->middleware('auth');
+
+Route::delete('attachments/{attachment}', [AttachmentController::class, 'destroy'])
+    ->name('attachments.destroy')
+    ->middleware('auth');
 
 require __DIR__.'/auth.php';
