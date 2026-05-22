@@ -71,7 +71,7 @@ class TaskController extends Controller
     {
         $this->authorize('view', $task);
         
-        $task->load(['category', 'tags', 'assignees', 'attachments']);
+        $task->load(['category', 'tags', 'assignees', 'attachments', 'comments.user']);
 
         return view('tasks.show', compact('task'));
     }

@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="{{ route('tasks.index') }}"
-                   class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
@@ -15,7 +15,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('tasks.edit', $task) }}"
-                   class="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white text-sm rounded-lg hover:bg-yellow-600 transition-colors font-medium">
+                    class="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white text-sm rounded-lg hover:bg-yellow-600 transition-colors font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
@@ -81,7 +81,7 @@
                     @csrf
                     <div class="flex items-center gap-3">
                         <input type="file" name="files[]" multiple
-                               class="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 file:text-sm file:font-medium">
+                                class="text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 file:text-sm file:font-medium">
                         <button type="submit"
                                 class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors font-medium whitespace-nowrap">
                             Subir
@@ -102,11 +102,11 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <a href="{{ asset('storage/' . $attachment->path) }}"
-                                       class="text-indigo-600 hover:text-indigo-800 text-xs font-medium" target="_blank">
+                                        class="text-indigo-600 hover:text-indigo-800 text-xs font-medium" target="_blank">
                                         Descargar
                                     </a>
                                     <form action="{{ route('attachments.destroy', $attachment) }}" method="POST"
-                                          onsubmit="return confirm('¿Eliminar archivo?')">
+                                            onsubmit="return confirm('¿Eliminar archivo?')">
                                         @csrf
                                         @method('DELETE')
                                         <button class="text-red-500 hover:text-red-700 text-xs font-medium">
@@ -121,6 +121,58 @@
                     <p class="text-gray-400 text-sm">Sin archivos adjuntos aún.</p>
                 @endif
             </div>
+
+            {{-- Comentarios --}}
+            <div class="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 class="font-semibold text-gray-900 mb-4">Comentarios ({{ $task->comments->count() }})</h3>
+
+                {{-- Formulario nuevo comentario --}}
+                <form action="{{ route('comments.store', $task) }}" method="POST" class="mb-6">
+                    @csrf
+                    <textarea name="body" rows="2" placeholder="Escribe un comentario..."
+                            class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
+                            required maxlength="1000"></textarea>
+                    @error('body') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                    <div class="flex justify-end mt-2">
+                        <button type="submit"
+                                class="px-4 py-2 text-sm text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors font-medium">
+                            Comentar
+                        </button>
+                    </div>
+                </form>
+
+                {{-- Lista de comentarios --}}
+                @if($task->comments->count())
+                    <div class="space-y-4">
+                        @foreach($task->comments as $comment)
+                            <div class="flex gap-3">
+                                <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-sm font-semibold text-indigo-700 flex-shrink-0">
+                                    {{ substr($comment->user->name, 0, 1) }}
+                                </div>
+                                <div class="flex-1 bg-gray-50 rounded-lg p-3">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <span class="text-sm font-medium text-gray-800">{{ $comment->user->name }}</span>
+                                            <span class="text-xs text-gray-400 ml-2">{{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        @if($comment->user_id === auth()->id())
+                                            <form action="{{ route('comments.destroy', $comment) }}" method="POST"
+                                                onsubmit="return confirm('¿Eliminar comentario?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="text-red-400 hover:text-red-600 text-xs">Eliminar</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                    <p class="text-sm text-gray-700 mt-1">{{ $comment->body }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="text-gray-400 text-sm">Sin comentarios aún.</p>
+                @endif
+            </div>
         </div>
 
         {{-- Columna lateral --}}
@@ -131,7 +183,7 @@
                 <h3 class="font-semibold text-gray-900 mb-3">Categoría</h3>
                 @if($task->category)
                     <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm text-white font-medium"
-                          style="background-color: {{ $task->category->color }}">
+                            style="background-color: {{ $task->category->color }}">
                         {{ $task->category->name }}
                     </span>
                 @else
