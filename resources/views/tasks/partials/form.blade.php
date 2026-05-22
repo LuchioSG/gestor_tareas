@@ -1,7 +1,7 @@
 {{-- Título --}}
 <div class="mb-5">
     <label class="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-    <input type="text" name="title" value="{{ old('title', $task->title ?? '') }}" required
+    <input type="text" name="title" value="{{ old('title', $task->title ?? '') }}"
             class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
     @error('title') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
 </div>
@@ -88,3 +88,55 @@
         @endforeach
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+    const titleInput = document.querySelector('input[name="title"]');
+    const dueDateInput = document.querySelector('input[name="due_date"]');
+
+    form.addEventListener('submit', function (e) {
+        let valid = true;
+
+        // Validar título
+        if (titleInput.value.trim().length < 3) {
+            showError(titleInput, 'El título debe tener al menos 3 caracteres.');
+            valid = false;
+        } else {
+            clearError(titleInput);
+        }
+
+        // Validar fecha límite no sea pasada
+        if (dueDateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            if (dueDateInput.value < today) {
+                showError(dueDateInput, 'La fecha límite no puede ser en el pasado.');
+                valid = false;
+            } else {
+                clearError(dueDateInput);
+            }
+        }
+
+        if (!valid) e.preventDefault();
+    });
+
+    // Limpiar error al escribir
+    titleInput.addEventListener('input', () => clearError(titleInput));
+    dueDateInput.addEventListener('change', () => clearError(dueDateInput));
+
+    function showError(input, message) {
+        clearError(input);
+        input.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        const error = document.createElement('p');
+        error.className = 'text-red-500 text-xs mt-1 js-error';
+        error.textContent = message;
+        input.parentNode.appendChild(error);
+    }
+
+    function clearError(input) {
+        input.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        const error = input.parentNode.querySelector('.js-error');
+        if (error) error.remove();
+    }
+});
+</script>
