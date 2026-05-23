@@ -197,7 +197,7 @@
                 @if($task->tags->count())
                     <div class="flex flex-wrap gap-2">
                         @foreach($task->tags as $tag)
-                            <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-medium">
+                            <span class="px-3 py-1 bg-gray-300 text-indigo-700 rounded-full text-xs font-medium">
                                 {{ $tag->name }}
                             </span>
                         @endforeach
